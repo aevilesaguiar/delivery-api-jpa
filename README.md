@@ -278,6 +278,44 @@ Método que retorna uma lista
 
 ![img_1.png](img_1.png)
 
+Metodo que procuramos por algo contido
+
+    @GetMapping("/cozinhas/por-nome-contain")
+        public List<Cozinha> findAllByNomeContaining( String nome){
+            return cozinhaRepository.findAllByNomeContaining(nome);
+        }
+
+
+![img_2.png](img_2.png)
+
+
+- o Spring Data JPA possui algumas palavras chaves(key words) que podemos usar.
+- 
+![img_3.png](img_3.png) 
+
+
+Exemplos:
+
+    @GetMapping("/restaurantes/por-taxa-frete")
+    public List<Restaurante> restaurantesPorTaxaFrete(
+            BigDecimal taxaInicial, BigDecimal taxaFinal) {
+        return restauranteRepository.findByTaxaFreteBetween(taxaInicial, taxaFinal);
+    }
+
+
+
+![img_4.png](img_4.png)
+
+localhost:8080/teste/restaurantes/por-taxa-frete?taxaInicial=12&taxaFinal=20
+
+No nosso console aparece
+
+restaurant0_ where restaurant0_.taxa_frete between ? and ?
+Hibernate: select cozinha0_.id as id1_1_0_, cozinha0_.nome as nome2_1_0_ from cozinha cozinha0_ where cozinha0_.id=?
+
+
+
+
 ## Observações Importantes
 
 @Service é apenas para adicionar semantica ao código já o @Repository não  ela tem uma funcionalidade que é um tradutor de exceptions,
@@ -297,3 +335,5 @@ Ou seja passaremos por parametros de query. No postman temos os querys Params
 ## Referencias
 
 - https://www.baeldung.com/java-optional
+- Doc Spring Data jpa -> https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repository-query-keywords
+- JPA Repositories ->https://docs.spring.io/spring-data/jpa/docs/1.6.0.RELEASE/reference/html/jpa.repositories.html

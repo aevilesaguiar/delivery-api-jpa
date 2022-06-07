@@ -14,6 +14,12 @@ public interface CozinhaRepository  extends JpaRepository< Cozinha, Long> {
 //Personalizando método
     List<Cozinha> findTodasBynome(String nome);
 
+    //busca sendo feito utilizando a flag Containing , Containing coloca o like e o percent antes e depois
+    List<Cozinha> findAllByNomeContaining(String nome);
+
+
     //retornando apenas uma cozinha
    Optional <Cozinha> findByNome(String nome);
+
+
 }
