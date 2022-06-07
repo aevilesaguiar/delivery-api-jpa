@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/estados")
@@ -40,13 +41,13 @@ public class EstadoController {
     @PutMapping("/{estadoId}")
     public ResponseEntity<Estado> atualizar(@PathVariable Long estadoId,
                                             @RequestBody Estado estado) {
-        Estado estadoAtual = estadoRepository.findById(estadoId);
+        Optional<Estado> estadoAtual = estadoRepository.findById(estadoId);
 
-        if (estadoAtual != null) {
-            BeanUtils.copyProperties(estado, estadoAtual, "id");
+        if (estadoAtual.isPresent()) {
+            BeanUtils.copyProperties(estado, estadoAtual.get(), "id");
 
-            estadoAtual = estadoService.salvar(estadoAtual);
-            return ResponseEntity.ok(estadoAtual);
+         Estado estadosalvo = estadoService.salvar(estadoAtual.get());
+            return ResponseEntity.ok(estadoAtual.get());
         }
 
         return ResponseEntity.notFound().build();

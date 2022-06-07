@@ -78,6 +78,7 @@ public class CozinhaController {
                         }
 
                         return ResponseEntity.notFound().build();
+
                 } catch (EntidadeNaoEncontradaException e){
                         return ResponseEntity.badRequest().body(e.getMessage());
                 }

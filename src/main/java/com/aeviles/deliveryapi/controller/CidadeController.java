@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/cidades")
@@ -30,10 +31,10 @@ public class CidadeController {
 
     @GetMapping(value = "/{cidadeId}")
     public ResponseEntity<Cidade> findById(@PathVariable Long cidadeId){
-        Cidade cidade=cidadeRepository.findById(cidadeId);
+        Optional<Cidade> cidade=cidadeRepository.findById(cidadeId);
 
-        if(cidade!= null){
-            return ResponseEntity.ok(cidade);
+        if(cidade.isPresent()){
+            return ResponseEntity.ok(cidade.get());
         }
         return ResponseEntity.notFound().build(); //404
     }
@@ -54,10 +55,14 @@ public class CidadeController {
     public ResponseEntity<?> atualizar(@PathVariable Long cidadeId, @RequestBody Cidade cidade){
 
         try {
-            Cidade cidadeAtual = cidadeRepository.findById(cidadeId);
-            if(cidade != null){
-                BeanUtils.copyProperties(cidade, cidadeAtual,"id");
-                cidadeAtual=cidadeRepository.salvar(cidadeAtual);
+            Optional <Cidade> cidadeAtual = cidadeRepository.findById(cidadeId);
+
+            if(cidadeAtual.isPresent()){
+                BeanUtils.copyProperties(cidade, cidadeAtual.get(),"id");
+
+                //eu quero copiar as propriedades de cidade para dentro das propriedade de cidadeatual que está dentro do Optional
+
+              Cidade cidadesalva=cidadeRepository.save(cidadeAtual.get());
 
                 return ResponseEntity.ok(cidadeAtual);
             }
@@ -65,6 +70,7 @@ public class CidadeController {
             return ResponseEntity.notFound().build();
 
         }catch (EntidadeNaoEncontradaException e){
+
             return  ResponseEntity.badRequest().body(e.getMessage());
         }
 

@@ -40,22 +40,6 @@ public class RestauranteService {
         return restauranteRepository.save(restaurante);
 
 
-
-       /* outra forma de fazer
-
-        Optional <Cozinha> cozinha = cozinhaRepository.findById(cozinhaId);
-
-        //se a cozinha está vazia?
-        if(cozinha.isEmpty()){
-            throw new EntidadeNaoEncontradaException(
-                    String.format("Não existe cadastro de cozinha com código %d",cozinhaId)
-            );
-        }
-        //atribuir a cozinha ao restaurante
-        restaurante.setCozinha(cozinha.get());//eu quero pegar a cozinha que está dentro do Optional
-
-
-        return restauranteRepository.salvar(restaurante);*/
     }
 
 
