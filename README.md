@@ -480,13 +480,50 @@ Anotamos esse método com @Query do spring framework , como propriedade passamos
 Agora fazemos um biding do parametro que recebemos do método nos atributos do jpql. Exe: parametro nome do metodo , faz um biding no
 atributo nome do jpql. Ou seja o que eu recebo de parametro do nome(no método) eu passo para o nome da consulta
 
-@Query("from Restaurante where nome like %:nome% and cozinha.id=:id") //:if-: fazer biding
-List<Restaurante> queryByName(String nome,@Param("id") Long cozinha);//@Param(id) é o nome do pametro que quero fazer o biding
+
+-Query nomeada, de modo que fique mais legível o código
+@Query("select u from restaurante u where u.nome like %:nome% and cozinha.id = :id") //:if-: fazer biding
+List<Restaurante> consultarPorNome(@Param("nome") String nome,@Param("id") Long cozinha);
 
 
 - muito Importante:https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods.at-query
 - documentação que cita como pesquisar com @Query
 
+## Externalizando consultas JPQL para um arquivo XML
+
+-> CRIAR UMA PASTA COM O NOME: META-INF = nesta pasta podemos colocar arquivos de meta informações para configurar algo em nosso projeto.
+Dentro da pasta META-INF que está dentro de resources, criaremos um arquivo chamado orm.xml.
+
+dentro desse arquivo incluíremos o código:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings
+xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd"
+version="2.2">
+
+</entity-mappings>
+
+
+Esse código referencia diz que o nosso arquivo xml faz mapeamento de entidades, seus relacionamentos e queries nomeadas;
+
+Esse é um arquivo de configuração do próprio  JPA, não é do Spring Data JPA.
+
+tem uma tag chamada named-query, e fazemos o mapeamento nela. 
+
+<named-query name="Restaurante.consultarPorNome">  //temos que colocar a entidade(Restaurante) precido pelo o nome do método(.consultarPorNome
+		<query>
+		from Restaurante
+		where nome like concat('%', :nome, '%')
+		and cozinha.id = :id
+		</query>
+	</named-query>
+
+restaurant0_ where (restaurant0_.nome like concat('%', ?, '%')) and restaurant0_.cozinha_id=?
+
+o arquivo orm.xml nos ajuda a criar mapeamento de entidades, seus relacionamentos e queries nomeadas deixando o nosso arquivos
+bem mais limpo
 
 ## Observações Importantes
 

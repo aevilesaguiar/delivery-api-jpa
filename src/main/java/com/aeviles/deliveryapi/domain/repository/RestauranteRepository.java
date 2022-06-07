@@ -18,7 +18,7 @@ public interface RestauranteRepository extends JpaRepository<Restaurante, Long> 
 
     //consultarPorNome
     //localhost:8080/teste/restaurantes/por-nome?nome=v&cozinhaId=1
-    @Query("select u from restaurante u where u.nome like %:nome% and cozinha.id = :id") //:if-: fazer biding
+    //@Query("select u from restaurante u where u.nome like %:nome% and cozinha.id = :id") //:if-: fazer biding
     List<Restaurante> consultarPorNome(@Param("nome") String nome,@Param("id") Long cozinha);//@Param(id) é o nome do pametro que quero fazer o biding
                                                                         //o biding poderia ser automatico no caso do is=d. se eu colocasse :cozinha
 
