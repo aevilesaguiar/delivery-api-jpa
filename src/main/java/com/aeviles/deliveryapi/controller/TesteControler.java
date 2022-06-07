@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/teste") //a requisição será realizada/teste/cozinhas/por-nome
@@ -16,11 +17,17 @@ public class TesteControler {
 
         @Autowired
         private CozinhaRepository cozinhaRepository;
-/*
+
         @GetMapping("/cozinhas/por-nome")
-        public List<Cozinha> cozinhaPorNome(@RequestParam("nome") String nome){//OU SEJA PARAMETRO DA REQUISIÇÃO, ou seja o nome do parametro
-                                                                                //ou seja estou fazendo o biding para a variavel que estou recebendo como argumento do método
-            return cozinhaRepository.consultarPorNome(nome);
-        }*/
+        public List<Cozinha> cozinhasPorNome( String nome){
+            return cozinhaRepository.findTodasBynome(nome);
+        }
+
+        @GetMapping("/cozinhas/unica-por-nome")
+       public Optional<Cozinha> cozinhaPorNome(String nome){
+                return cozinhaRepository.findByNome(nome);
+        }
+
+
 
 }

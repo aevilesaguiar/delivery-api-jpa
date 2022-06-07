@@ -5,19 +5,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CozinhaRepository  extends JpaRepository< Cozinha, Long> {
 
 
+//Personalizando método
+    List<Cozinha> findTodasBynome(String nome);
 
-    //List<Cozinha> consultarPorNome(String nome);
-
-
-
-
-
-
-
-
+    //retornando apenas uma cozinha
+   Optional <Cozinha> findByNome(String nome);
 }

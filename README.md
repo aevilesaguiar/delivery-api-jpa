@@ -251,6 +251,32 @@ assertEquals("john", name);
 }
 
 
+## Utilizando o Spring Data Jpa
+
+- Personalizando Meódos
+O Spring Data Jpa quando utilizamos findByatributo ele reconhece.
+- Exemplo:     List<Cozinha> findBynome(String nome); -> findByCriterios , findBy é um prefixo e após ele colocamos os criterios , e são diversos
+-  List<Cozinha> finddescricaoQualquercoisaBynome(String nome);-> também funciona, só devemos nos atentar as palavras chaves
+
+Ou seja podemos compor o nome do método com o Spring Data JPA.
+
+Método que retorna uma unica Instancia:
+
+@GetMapping("/cozinhas/unica-por-nome")
+public Optional<Cozinha> cozinhaPorNome(String nome){
+return cozinhaRepository.findByNome(nome);
+}
+
+![img.png](img.png)
+
+Método que retorna uma lista 
+
+        @GetMapping("/cozinhas/por-nome")
+        public List<Cozinha> cozinhasPorNome( String nome){
+            return cozinhaRepository.findTodasBynome(nome);
+        }
+
+![img_1.png](img_1.png)
 
 ## Observações Importantes
 
@@ -264,6 +290,8 @@ testar nosso código pois ele pode lançar Exceções diferentes
 
 Faremos uma busca por nome usando JPQL . No POSTMAN passaremos por exemplo: localhost:8080/teste/cozinhas/por-nome/nome=Tailandesa . 
 Ou seja passaremos por parametros de query. No postman temos os querys Params
+
+
 
 
 ## Referencias
