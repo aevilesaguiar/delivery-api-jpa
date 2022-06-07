@@ -14,6 +14,8 @@ import java.util.Optional;
 @Repository
 public interface RestauranteRepository extends JpaRepository<Restaurante, Long> {
 
+    public List<Restaurante> find(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal );
+
     List<Restaurante> findByTaxaFreteBetween(BigDecimal taxaInicial, BigDecimal taxaFinal);
 
     //consultarPorNome
