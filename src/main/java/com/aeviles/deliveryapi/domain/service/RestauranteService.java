@@ -27,7 +27,7 @@ public class RestauranteService {
     public Restaurante salvar(Restaurante restaurante) {
 
         Long cozinhaId = restaurante.getCozinha().getId();
-        //retorna para mim a ciznha que estiver dentro do Optional
+        //retorna para mim a cozinha que estiver dentro do Optional
         Cozinha cozinha=cozinhaRepository.findById(cozinhaId)
                 //sen~~ao tiver nada , lança uma exceção
                 .orElseThrow(()-> new EntidadeNaoEncontradaException( //Op
@@ -37,7 +37,7 @@ public class RestauranteService {
         restaurante.setCozinha(cozinha);//eu quero pegar a cozinha que está dentro do Optional
 
 
-        return restauranteRepository.salvar(restaurante);
+        return restauranteRepository.save(restaurante);
 
 
 
@@ -62,7 +62,7 @@ public class RestauranteService {
     public void remover(Long restauranteId){
 
         try {
-            restauranteRepository.remover(restauranteId);
+            restauranteRepository.deleteById(restauranteId);
         }catch (EmptyResultDataAccessException e){
             throw new EntidadeNaoEncontradaException(String.format("Não existe um cadastro de restaurantecom código %d",restauranteId));
         }

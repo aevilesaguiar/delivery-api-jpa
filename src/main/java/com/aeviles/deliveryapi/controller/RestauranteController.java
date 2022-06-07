@@ -18,6 +18,7 @@ import javax.persistence.EntityManager;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 @RestController //essa anotação é um controlador e possui @Response body
@@ -39,15 +40,14 @@ public class RestauranteController {
 
         @GetMapping(value = "/{restauranteId}")
         public ResponseEntity<Restaurante> findById(@PathVariable Long restauranteId) {
-                Restaurante restaurante = restauranteRepository.findById(restauranteId);
 
-                if (restaurante != null) { //se a cozinha não está nulo, ou seja existe
+                Optional<Restaurante> restaurante = restauranteRepository.findById(restauranteId);
 
-                        return ResponseEntity.ok(restaurante);   //retorne a representação da cozinha
+                if (restaurante.isPresent()) { //se a cozinha não está nulo, ou seja existe
+
+                        return ResponseEntity.ok(restaurante.get());   //retorne a representação da cozinha
                 }
 
-                //return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-                // OU O ATALHO
                 return ResponseEntity.notFound().build();  //caso contrário retorne NOTfOUND sem corpo algum
 
         }
@@ -66,7 +66,7 @@ public class RestauranteController {
                                 .body(e.getMessage());
                 }
         }
-
+/*
         @DeleteMapping({"/restauranteId"})
         public ResponseEntity<Restaurante> remover(@PathVariable Long restauranteId) {
 
@@ -88,19 +88,18 @@ public class RestauranteController {
 
 
         }
-
+*/
 
         @PutMapping("/{restauranteId}")
         public ResponseEntity<?> atualizar(@PathVariable Long restauranteId, @RequestBody Restaurante restaurante) {
 
                 try {
-                        //restauranteatual é o restaurante persistido no banco de dados  eu tenho que pegar restaurante e colocar dentro
-                        // de restauranteatual
-                        Restaurante restauranteAtual = restauranteRepository.findById(restauranteId);
+                        Optional<Restaurante> restauranteAtual = restauranteRepository.findById(restauranteId);
+                        //Existe alguma coisa dentro desse Optional?
+                        if (restauranteAtual.isPresent()) {
+                                BeanUtils.copyProperties(restaurante, restauranteAtual.get(), "id");
 
-                        if (restaurante != null) {
-                                BeanUtils.copyProperties(restaurante, restauranteAtual, "id");
-                                restauranteAtual = restauranteService.salvar(restauranteAtual);
+                                Restaurante restauranteSalvo = restauranteService.salvar(restauranteAtual.get());
                                 return ResponseEntity.ok(restauranteAtual);
                         }
 
@@ -119,9 +118,9 @@ public class RestauranteController {
         public ResponseEntity<?> atualizarParcial(@PathVariable Long restauranteId,
                                                   @RequestBody Map<String, Object> campos) {
 
-                Restaurante restauranteAtual = restauranteRepository.findById(restauranteId);
+                Restaurante restauranteAtual = restauranteRepository.findById(restauranteId).orElse(null);
 
-                if (restauranteAtual == null) {
+                if (restauranteAtual==null) {
                         return ResponseEntity.notFound().build();
                 }
 
