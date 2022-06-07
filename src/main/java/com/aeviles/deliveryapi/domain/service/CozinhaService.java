@@ -25,12 +25,12 @@ public class CozinhaService {
     //Mas poderia ter uma regra de negócio
     //Não mexeria mais no controller , só aqui
     public Cozinha salvar(Cozinha cozinha){
-        return cozinhaRepository.salvar(cozinha);
+        return cozinhaRepository.save(cozinha);
     }
 
     public void remover(Long cozinhaId){
         try {
-            cozinhaRepository.remover(cozinhaId);
+            cozinhaRepository.deleteById(cozinhaId);
         }catch (EmptyResultDataAccessException e){
             throw  new EntidadeNaoEncontradaException( String.format("Não existe um cadastro de cozinha com código %d",cozinhaId));
         }

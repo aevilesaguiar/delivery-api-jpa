@@ -3,6 +3,7 @@ package com.aeviles.deliveryapi.infrastructure.repository;
 import com.aeviles.deliveryapi.domain.model.Permissao;
 import com.aeviles.deliveryapi.domain.repository.PermissaoRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -10,7 +11,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.List;
 
-@Component
+@Repository
 public class PermissaoRepositoryImpl implements PermissaoRepository {
 
     @PersistenceContext

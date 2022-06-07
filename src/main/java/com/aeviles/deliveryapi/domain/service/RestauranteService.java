@@ -15,6 +15,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class RestauranteService {
     @Autowired
@@ -25,19 +27,35 @@ public class RestauranteService {
     public Restaurante salvar(Restaurante restaurante) {
 
         Long cozinhaId = restaurante.getCozinha().getId();
-        Cozinha cozinha = cozinhaRepository.findById(cozinhaId);
+        //retorna para mim a ciznha que estiver dentro do Optional
+        Cozinha cozinha=cozinhaRepository.findById(cozinhaId)
+                //sen~~ao tiver nada , lança uma exceção
+                .orElseThrow(()-> new EntidadeNaoEncontradaException( //Op
+                        String.format("Não existe cadastro de cozinha com código %d",cozinhaId)));
 
-        //se a cozinha não existir lança uma exception
-        if(cozinha == null){
+        //atribuir a cozinha ao restaurante
+        restaurante.setCozinha(cozinha);//eu quero pegar a cozinha que está dentro do Optional
+
+
+        return restauranteRepository.salvar(restaurante);
+
+
+
+       /* outra forma de fazer
+
+        Optional <Cozinha> cozinha = cozinhaRepository.findById(cozinhaId);
+
+        //se a cozinha está vazia?
+        if(cozinha.isEmpty()){
             throw new EntidadeNaoEncontradaException(
                     String.format("Não existe cadastro de cozinha com código %d",cozinhaId)
             );
         }
         //atribuir a cozinha ao restaurante
-        restaurante.setCozinha(cozinha);
+        restaurante.setCozinha(cozinha.get());//eu quero pegar a cozinha que está dentro do Optional
 
 
-        return restauranteRepository.salvar(restaurante);
+        return restauranteRepository.salvar(restaurante);*/
     }
 
 

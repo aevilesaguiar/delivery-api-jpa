@@ -5,6 +5,7 @@ import com.aeviles.deliveryapi.domain.repository.CidadeRepository;
 import com.aeviles.deliveryapi.domain.repository.EstadoRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -12,7 +13,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.List;
 
-@Component
+@Repository
 public class CidadeRepositoryImpl implements CidadeRepository {
 
     @PersistenceContext
