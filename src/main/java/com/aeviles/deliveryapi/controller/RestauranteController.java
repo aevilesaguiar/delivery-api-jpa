@@ -22,7 +22,7 @@ import java.util.Optional;
 
 
 @RestController //essa anotação é um controlador e possui @Response body
-@RequestMapping("/restaurantes")//todas as requisições /restaurantes vão cair nessa requisição
+@RequestMapping(value = "/restaurantes")//todas as requisições /restaurantes vão cair nessa requisição
 public class RestauranteController {
 
 
@@ -66,29 +66,6 @@ public class RestauranteController {
                                 .body(e.getMessage());
                 }
         }
-/*
-        @DeleteMapping({"/restauranteId"})
-        public ResponseEntity<Restaurante> remover(@PathVariable Long restauranteId) {
-
-                try {
-                        restauranteService.remover(restauranteId);
-                        return ResponseEntity.noContent().build();
-                }
-
-                //Entidade não foi encontrada?
-                catch (EntidadeNaoEncontradaException e) {
-
-                        return ResponseEntity.notFound().build();
-
-                }
-                //entidade está em uso?
-                catch (EntidadeEmUsoException e) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT).build();
-                }
-
-
-        }
-*/
 
         @PutMapping("/{restauranteId}")
         public ResponseEntity<?> atualizar(@PathVariable Long restauranteId, @RequestBody Restaurante restaurante) {

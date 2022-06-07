@@ -18,31 +18,40 @@ import java.util.Optional;
 @RequestMapping("/teste") //a requisição será realizada/teste/cozinhas/por-nome
 public class TesteControler {
 
-        @Autowired
-        private CozinhaRepository cozinhaRepository;
+    @Autowired
+    private CozinhaRepository cozinhaRepository;
 
-        @Autowired
-        private RestauranteRepository restauranteRepository;
+    @Autowired
+    private RestauranteRepository restauranteRepository;
 
-        @GetMapping("/cozinhas/por-nome")
-        public List<Cozinha> cozinhasPorNome( String nome){
-            return cozinhaRepository.findTodasBynome(nome);
-        }
-
-
-        @GetMapping("/cozinhas/por-nome-contain")
-        public List<Cozinha> findAllByNomeContaining( String nome){
-            return cozinhaRepository.findAllByNomeContaining(nome);
-        }
+    @GetMapping("/cozinhas/por-nome")
+    public List<Cozinha> cozinhasPorNome(String nome) {
+        return cozinhaRepository.findTodasBynome(nome);
+    }
 
 
-        @GetMapping("/cozinhas/unica-por-nome")
-       public Optional<Cozinha> cozinhaPorNome(String nome){
-                return cozinhaRepository.findByNome(nome);
-        }
+    @GetMapping("/cozinhas/por-nome-contain")
+    public List<Cozinha> findAllByNomeContaining(String nome) {
+        return cozinhaRepository.findAllByNomeContaining(nome);
+    }
 
 
-        /*Testando novos metodos Restaurantes*/
+    @GetMapping("/cozinhas/unica-por-nome")
+    public Optional<Cozinha> cozinhaPorNome(String nome) {
+        return cozinhaRepository.findByNome(nome);
+    }
+
+
+    //geralmente utilizado na regra de negócios , as vezes quer checar se registro com determinado nome existe
+    //localhost:8080/teste/cozinhas/exists?nome=Tailandesa
+    @GetMapping("/cozinhas/exists")
+    public boolean cozinhaExists(String nome) {
+        return cozinhaRepository.existsByNome(nome);
+    }
+
+
+
+    /*Testando novos metodos Restaurantes*/
 
     @GetMapping("/restaurantes/por-taxa-frete")
     public List<Restaurante> restaurantesPorTaxaFrete(
@@ -50,13 +59,43 @@ public class TesteControler {
         return restauranteRepository.findByTaxaFreteBetween(taxaInicial, taxaFinal);
     }
 
-    //localhost:8080/teste/restaurantes/por-nome?nome=d&cozinhaId=1 -> POSTMAN
     @GetMapping("/restaurantes/por-nome")
     public List<Restaurante> restaurantesContemCozinha(String nome, Long cozinhaId) {
-        return restauranteRepository.findByNomeContainingAndCozinhaId(nome, cozinhaId);
+        return restauranteRepository.consultarPorNome(nome, cozinhaId);
+    }
+
+    //localhost:8080/teste/restaurantes/primeiro-por-nome?nome=t
+    //restaurant0_ where restaurant0_.nome like ? escape ? limit
+
+    @GetMapping("/restaurantes/primeiro-por-nome")
+    public Optional<Restaurante> restaurantesPrimeiroPorNome(String nome) {
+        return restauranteRepository.findFirstByNomeContaining(nome);
+
+
+    }
+
+    //localhost:8080/teste/restaurantes/top2-por-nome?nome=t  -> 2 nomes
+    @GetMapping("/restaurantes/top2-por-nome")
+    public List<Restaurante> restaurantesTop2PorNome(String nome) {
+        return restauranteRepository.findTop2ByNomeContaining(nome);
+
+
     }
 
 
+    //localhost:8080/teste/restaurantes/top3-por-nome?nome=t  -> 3 nomes
+    @GetMapping("/restaurantes/top3-por-nome")
+    public List<Restaurante> restaurantesTop3PorNome(String nome) {
+        return restauranteRepository.findTop3ByNomeContaining(nome);
+
+
+    }
+
+    //localhost:8080/teste/restaurantes/count-por-cozinha?cozinhaId=1
+    @GetMapping("/restaurantes/count-por-cozinha")
+    public int restaurantesCountPorCozinha(Long cozinhaId) {
+        return restauranteRepository.countByCozinhaId(cozinhaId);
+    }
 
 
 }

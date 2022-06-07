@@ -313,7 +313,179 @@ No nosso console aparece
 restaurant0_ where restaurant0_.taxa_frete between ? and ?
 Hibernate: select cozinha0_.id as id1_1_0_, cozinha0_.nome as nome2_1_0_ from cozinha cozinha0_ where cozinha0_.id=?
 
+Para que o Spring Data JPA interpretar o nome do nosso método e criar a consulta automaticamente , tivemos que prefixar 
+o nome do método com findBy.
 
+Além do find, nós temos outros prefixos como o read, get, query, exists (boolean), count(contando quantos registros tem) ou stream, todos tem funcionamento igual.
+
+Podemos prefixar nossos métodos de consulta com diferentes prefixos, além disso podemos usar a flaf, Firts, top2, topNumero limitamos a 
+quantidade de consulta. Podemos Utilizar prefixos como exists e count que nos ajuda  a verificar se um determinado registro exis(true ou false)
+ou para fazer um count(select count).Ex: select count(restaurant0_.id) as col_0_0_ from restaurante restaurant0_ left outer join cozinha cozinha1_ on restaurant0_.cozinha_id=cozinha1_.id where cozinha1_.id=?
+
+Tem uma flag que podemos passar após o prefixo. Flag é uma palavra reservada, key-word.
+
+Por exemplo: Optional<Restaurante> findFirstByNomeContaining(String nome); 
+
+A ideia e que ele implemente uma consulta com o primiero resultado
+
+Exemplos repository com query Metods
+
+
+@Repository
+public interface RestauranteRepositoryTest extends JpaRepository<Restaurante, Long> {
+
+    //buscar pela taxaFrete, só que eu quero que nosso metodos receba dois BigDecimal inicial e final, e filtrar apenas
+    // por restaurantes que tenham a taxa frete entre a faixa inicial e final
+    List<Restaurante> findByTaxaFreteBetween(BigDecimal taxaInicial, BigDecimal taxaFinal);
+
+    List<Restaurante> findByNomeContainingAndCozinhaId(String nome, Long cozinha);
+
+    Optional<Restaurante> findFirstByNomeContaining(String nome);
+
+    //quero só os primeiros 2
+    List<Restaurante> findTop2ByNomeContaining(String nome);
+
+    //quero só os primeiros 3
+    List<Restaurante> findTop3ByNomeContaining(String nome);
+
+    //conte quantas cozinhas tem cadastrado no banco de dados
+    int countByCozinhaId(Long cozinha);
+
+}
+
+
+@Repository
+public interface CozinhaRepositoryTest extends JpaRepository< Cozinha, Long> {
+
+
+//Personalizando método
+List<Cozinha> findTodasBynome(String nome);
+
+    //busca sendo feito utilizando a flag Containing , Containing coloca o like e o percent antes e depois
+    List<Cozinha> findAllByNomeContaining(String nome);
+
+
+    //retornando apenas uma cozinha
+Optional <Cozinha> findByNome(String nome);
+
+//se existir ele retonar true , senão ele retorna false
+boolean existsByNome(String nome);
+
+
+
+}
+
+- Controllers
+
+@RestController
+@RequestMapping("/teste") //a requisição será realizada/teste/cozinhas/por-nome
+public class TesteControlerCriandoQueriesmetods {
+
+    @Autowired
+    private CozinhaRepositoryTest cozinhaRepository;
+
+    @Autowired
+    private RestauranteRepositoryTest restauranteRepository;
+
+    @GetMapping("/cozinhas/por-nome")
+    public List<Cozinha> cozinhasPorNome(String nome) {
+        return cozinhaRepository.findTodasBynome(nome);
+    }
+
+
+    @GetMapping("/cozinhas/por-nome-contain")
+    public List<Cozinha> findAllByNomeContaining(String nome) {
+        return cozinhaRepository.findAllByNomeContaining(nome);
+    }
+
+
+    @GetMapping("/cozinhas/unica-por-nome")
+    public Optional<Cozinha> cozinhaPorNome(String nome) {
+        return cozinhaRepository.findByNome(nome);
+    }
+
+
+    //geralmente utilizado na regra de negócios , as vezes quer checar se registro com determinado nome existe
+    //localhost:8080/teste/cozinhas/exists?nome=Tailandesa
+    @GetMapping("/cozinhas/exists")
+    public boolean cozinhaExists(String nome) {
+        return cozinhaRepository.existsByNome(nome);
+    }
+
+
+
+    /*Testando novos metodos Restaurantes*/
+
+    @GetMapping("/restaurantes/por-taxa-frete")
+    public List<Restaurante> restaurantesPorTaxaFrete(
+            BigDecimal taxaInicial, BigDecimal taxaFinal) {
+        return restauranteRepository.findByTaxaFreteBetween(taxaInicial, taxaFinal);
+    }
+
+    //localhost:8080/teste/restaurantes/por-nome?nome=d&cozinhaId=1 -> POSTMAN
+    @GetMapping("/restaurantes/por-nome")
+    public List<Restaurante> restaurantesContemCozinha(String nome, Long cozinhaId) {
+        return restauranteRepository.findByNomeContainingAndCozinhaId(nome, cozinhaId);
+    }
+
+    //localhost:8080/teste/restaurantes/primeiro-por-nome?nome=t
+    //restaurant0_ where restaurant0_.nome like ? escape ? limit
+
+    @GetMapping("/restaurantes/primeiro-por-nome")
+    public Optional<Restaurante> restaurantesPrimeiroPorNome(String nome) {
+        return restauranteRepository.findFirstByNomeContaining(nome);
+
+
+    }
+
+    //localhost:8080/teste/restaurantes/top2-por-nome?nome=t  -> 2 nomes
+    @GetMapping("/restaurantes/top2-por-nome")
+    public List<Restaurante> restaurantesTop2PorNome(String nome) {
+        return restauranteRepository.findTop2ByNomeContaining(nome);
+
+
+    }
+
+
+    //localhost:8080/teste/restaurantes/top3-por-nome?nome=t  -> 3 nomes
+    @GetMapping("/restaurantes/top3-por-nome")
+    public List<Restaurante> restaurantesTop3PorNome(String nome) {
+        return restauranteRepository.findTop3ByNomeContaining(nome);
+
+
+    }
+
+    //localhost:8080/teste/restaurantes/count-por-cozinha?cozinhaId=1
+    @GetMapping("/restaurantes/count-por-cozinha")
+    public int restaurantesCountPorCozinha(Long cozinhaId) {
+        return restauranteRepository.countByCozinhaId(cozinhaId);
+    }
+
+
+}
+
+
+
+
+## Usando queries JPQL customizadas com @Query
+
+Usando os queries metods do Spring Data JPA de acordo com os critérios, podemos não ter tudo que precisamos,
+então precisamos criar , ou seja quando não conseguimos criar consultas com os queries métods, ou quando o nome 
+do método está muito confuso.
+
+Para podermos criar nomes de métodos mais claros, podemos utilizar o JPQl conforme abaixo:
+
+Anotamos esse método com @Query do spring framework , como propriedade passamos uma consulta JPQL.
+
+Agora fazemos um biding do parametro que recebemos do método nos atributos do jpql. Exe: parametro nome do metodo , faz um biding no
+atributo nome do jpql. Ou seja o que eu recebo de parametro do nome(no método) eu passo para o nome da consulta
+
+@Query("from Restaurante where nome like %:nome% and cozinha.id=:id") //:if-: fazer biding
+List<Restaurante> queryByName(String nome,@Param("id") Long cozinha);//@Param(id) é o nome do pametro que quero fazer o biding
+
+
+- muito Importante:https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods.at-query
+- documentação que cita como pesquisar com @Query
 
 
 ## Observações Importantes
