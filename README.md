@@ -525,6 +525,95 @@ restaurant0_ where (restaurant0_.nome like concat('%', ?, '%')) and restaurant0_
 o arquivo orm.xml nos ajuda a criar mapeamento de entidades, seus relacionamentos e queries nomeadas deixando o nosso arquivos
 bem mais limpo
 
+## Repositorio Customizado
+
+É comum aparecer aalgumas situações que não é possivel criar consultas de modo simples , criando assinaturas de métodos,
+que tem expressões do próprio Spring Data JPA cria uma implementação para nós, criando uma querie nomeada com a anotação
+@Querie, ou ainda usando o arquivo orm.xml para colocar consultas jpql maiores.
+Mas as vezes temos que implentar código java, quando a consulta é dinamica, ou precisa executar alguma logica para essa 
+consulta acontecer, o spring Data Jpa permite que implementemos um repositorio customizado, apenas com os métodos que precisamos
+
+
+Para implementarmos um respositorio customizado nós temos que criar uma classe com o nome: RestauranteRepositoryImp, para
+implementar um repositorio customizado devemos incluir o nomedaClasse Repository e o impl, se colocar outro sufixo o spring 
+não identificará que é uma implementação customizada.
+
+
+O @PersistenceContext é usado especificamente quando precisamos injetar um EntityManager.
+
+O EntityManager é um serviço responsável por gerenciar as entidades, através dele é possível gerenciar o ciclo de vida 
+das entidades, operação de sincronização com a base de dados (inserir, atualizar ou remover), consultar entidades e outros.
+
+@PersistenceContext
+private EntityManager manager;
+
+
+A interface javax.persistence.EntityManager possui a assinatura de métodos para manipular as entidades, executar consultas 
+e outros.
+
+Ou seja eu crio a Classe: RestauranteRepositoryImpl
+depois de construir esse repositorio customizado eu extraio uma interface customizada dessa classe.
+
+
+## Implementando uma consulta simples com Criteria API.
+
+Criteria Api é uma API do JPA para criação de queries de forma programática. Ele é poderosa e burocrática. 
+Ajuda muito em consultas complexas e dinâmicas, que com JPQL seria dificil, a API permite que criemos
+uma consulta com código java, e no final uma querie sql é gerada e executada no banco de dados.
+
+CriteriaBuilder
+A CriteriaBuilder é uma interface do javax.persistence.criteria.CriteriaBuilder que nos permite criar consultas dinâmicas
+
+@PersistenceContext
+private EntityManager manager;
+Primeiro precisamos do EntityManager para prover a instância da nossa CriteriaBuilder
+
+CriteriaBuilder builder = manager.getCriteriaBuilder();
+
+Agora já temos o nosso builder que vai nos permitir a criação dos nossos filtros.
+
+Teoria dos conjuntos de SQL
+
+![img_5.png](img_5.png)
+
+
+A API Criteria é uma API para construir consultas com objetos Java™, como uma alternativa para construir strings para 
+consultas Java Persistence Query Language (JPQL).
+
+Lembrando que não é indicado para consultas simples, podemos usar JPQL mesmo ou o Spring Data JPA.
+
+A API Criteria oferece suporte à criação de consultas dinamicamente em tempo de execução e também à capacidade de criar
+consultas de tipo seguro que podem ser verificadas pelo compilador. A exatidão das consultas JPQL não pode ser verificada
+pelo compilador e deve ser verificada em tempo de execução durante o teste.
+
+Veja a seguir um exemplo de consulta JPQL que retorna uma lista de funcionários com menos de cinco anos de serviço:
+SELECT e FROM Employee e WHERE e.serviceyears < 5
+
+
+Aqui está uma amostra da consulta Criteria equivalente:
+QueryBuilder qb = emf.getQueryBuilder();
+CriteriaQuery q = qb.create(Employee.class);
+Root e = q.from(Employee.class);
+q.where(qb.lt(e.get(Employee_.serviceyears), 5));
+TypedQuery tq = em.createQuery(q);
+List result = q.getResultList();
+
+
+## StringBuilder
+
+O StringBuilder em Java representa uma seqüência mutável de caracteres . Como a String Class em Java cria uma sequência 
+imutável de caracteres, a classe StringBuilder fornece uma alternativa à String Class, pois cria uma sequência mutável 
+de caracteres.
+Por que StringBuilder é melhor que String Java?
+StringBuilder é rápido e consome menos memória do que uma string ao realizar concatenações . Isso ocorre porque string é 
+imutável em Java e a concatenação de dois objetos string envolve a criação de um novo objeto.
+
+
+
+
+
+
+
 ## Observações Importantes
 
 @Service é apenas para adicionar semantica ao código já o @Repository não  ela tem uma funcionalidade que é um tradutor de exceptions,
@@ -546,3 +635,6 @@ Ou seja passaremos por parametros de query. No postman temos os querys Params
 - https://www.baeldung.com/java-optional
 - Doc Spring Data jpa -> https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repository-query-keywords
 - JPA Repositories ->https://docs.spring.io/spring-data/jpa/docs/1.6.0.RELEASE/reference/html/jpa.repositories.html
+- https://docs.jboss.org/hibernate/orm/3.2/api/org/hibernate/Criteria.html
+- https://pt.linkedin.com/pulse/consultas-din%C3%A2micas-com-criteriabuilder-do-hibernate-barros-santos 
+- http://www.universidadejava.com.br/jee/jpa-entitymanager/#:~:text=O%20EntityManager%20%C3%A9%20um%20servi%C3%A7o,)%2C%20consultar%20entidades%20e%20outros.
