@@ -5,6 +5,8 @@ import com.aeviles.deliveryapi.domain.model.Cidade;
 import com.aeviles.deliveryapi.domain.repository.CidadeRepository;
 import com.aeviles.deliveryapi.domain.repository.EstadoRepository;
 import com.aeviles.deliveryapi.domain.service.CidadeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@Api(value = "Cidades")
 @RestController
 @RequestMapping("/cidades")
 public class CidadeController {
@@ -24,11 +27,13 @@ public class CidadeController {
     @Autowired
     private CidadeService cidadeService;
 
+    @ApiOperation(value = "Buscar todas as cidade")
     @GetMapping
     public List<Cidade> findAll(){
         return cidadeRepository.findAll();
     }
 
+    @ApiOperation(value = "Buscar uma cidade por ID")
     @GetMapping(value = "/{cidadeId}")
     public ResponseEntity<Cidade> findById(@PathVariable Long cidadeId){
         Optional<Cidade> cidade=cidadeRepository.findById(cidadeId);
@@ -39,6 +44,7 @@ public class CidadeController {
         return ResponseEntity.notFound().build(); //404
     }
 
+    @ApiOperation(value = "Salvar uma cidade")
     @PostMapping
     public ResponseEntity<?> salvar(@RequestBody Cidade cidade) {
         try {
@@ -51,6 +57,7 @@ public class CidadeController {
 
     }
 
+    @ApiOperation(value = "Atualizar uma cidade")
     @PutMapping(value = "/{cidadeId}")
     public ResponseEntity<?> atualizar(@PathVariable Long cidadeId, @RequestBody Cidade cidade){
 
@@ -77,6 +84,7 @@ public class CidadeController {
 
     }
 
+    @ApiOperation(value = "Remover uma cidade")
     @DeleteMapping(value = "/{cidadeId}")
     public ResponseEntity <Cidade> deletar( @PathVariable Long cidadeId ){
 

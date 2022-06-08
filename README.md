@@ -629,6 +629,146 @@ Ou seja passaremos por parametros de query. No postman temos os querys Params
 
 
 
+## Swagger (penAPI Specification )
+é um formato de descrição de API para APIs REST. Um arquivo OpenAPI permite que você descreva toda a sua API, incluindo:
+
+Endpoints disponíveis ( /users) e operações em cada endpoint ( GET /users, POST /users)
+Parâmetros de operação Entrada e saída para cada operação
+Métodos de autenticação
+Informações de contato, licença, termos de uso e outras informações.
+
+
+As especificações da API podem ser escritas em YAML ou JSON. O formato é fácil de aprender e legível para humanos e 
+máquinas. A especificação OpenAPI completa pode ser encontrada no GitHub: Especificação OpenAPI 3.0
+
+O Swagger é uma aplicação open source que auxilia os desenvolvedores a definir, criar, documentar e consumir APIs REST;
+É composto de um arquivo de configuração, que pode ser definido em YAML ou JSON;
+Fornece ferramentas para: auxiliar na definição do arquivo de configuração (Swagger Editor), interagir com API através das definições do arquivo de configuração (Swagger UI) e gerar templates de código a partir do arquivo de configuração (Swagger Codegen).
+
+Como é possível notar, o ponto mais importante é o arquivo de configuração do Swagger. É nele que a API é documentada.
+
+## acesso ao swagger
+
+http://localhost:8080/swagger-ui.html#/
+
+
+
+## Adicionando Swagger para testar sua api em spring boot
+
+A Swagger UI fornece uma pagina que lê um documento de especificação OpenAPI e gera um site de documentação interativo. 
+O tutorial a seguir mostra como gerar um documento de especificação OpenAPI a partir de seu projeto em spring boot.
+
+Configurando o Swagger no nosso projeto.
+Vamos abrir o nosso arquivo pom.xml e vamos adicionar as dependências abaixo.
+
+<dependency>
+<groupId>io.springfox</groupId>
+<artifactId>springfox-swagger2</artifactId>
+<version>2.9.2</version>
+</dependency>
+
+Para interagir com a configuração, também é necessário adicionar a dependência que fornece o Swagger UI:
+
+<dependency>
+<groupId>io.springfox</groupId>
+<artifactId>springfox-swagger-ui</artifactId>
+<version>2.9.2</version>
+<scope>compile</scope>
+</dependency>
+
+
+
+##  Integrando o Swagger 2 ao Projeto
+Agora vamos criar uma classe com o nome de SwaggerConfig, depois vamos deixar nossa classe com o código abaixo.
+
+package com.crm.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@Configuration
+@EnableSwagger2
+public class SwaggerConfig extends WebMvcConfigurationSupport {
+
+@Bean
+public Docket productApi() {
+return new Docket(DocumentationType.SWAGGER_2)
+.select()
+.apis(RequestHandlerSelectors.basePackage(“com.crm”))
+.build()
+.apiInfo(metaData());
+
+}
+
+private ApiInfo metaData() {
+return new ApiInfoBuilder()
+.title(“Spring Boot REST API”)
+.description(“\”Spring Boot REST API\””)
+.version(“1.0.0”)
+.license(“Apache License Version 2.0”)
+.licenseUrl(“https://www.apache.org/licenses/LICENSE-2.0\"")
+.build();
+}
+
+@Override
+protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+registry.addResourceHandler(“swagger-ui.html”)
+.addResourceLocations(“classpath:/META-INF/resources/”);
+
+registry.addResourceHandler(“/webjars/**”)
+.addResourceLocations(“classpath:/META-INF/resources/webjars/”);
+}
+}
+
+## Visão geral de anotações do springfox
+
+@Api Marca uma classe como um recurso de Swagger.
+@ApiImplicitParam Representa um único parâmetro em uma operação da API.
+@ApiImplicitParams Um wrapper para permitir uma lista de vários objetos ApiImplicitParam.
+@ApiModel Fornece informações adicionais sobre os modelos Swagger.
+@ApiModelProperty Adiciona e manipula dados de uma propriedade de modelo.
+@ApiOperation Descreve uma operação ou normalmente um método HTTP em um caminho específico.
+@ApiParam Adiciona meta-dados adicionais para parâmetros de operação.
+@ApiResponse Descreve uma possível resposta de uma operação.
+@ApiResponses Um wrapper para permitir uma lista de vários objetos ApiResponse.
+@Authorization Declara um esquema de autorização a ser usado em um recurso ou uma operação.
+@AuthorizationScope Descreve um escopo de autorização do OAuth2.
+
+
+Anotando em nossos controllers para documentação
+Acrescente a anotação @api para definir a classe para o swagger
+
+@RestController
+@Api(value = “Question”)
+public class QuestionController {
+
+Agora para cada endpoint, vamos anotar com o @ApiOperation para descrever o nosso endpoint.
+
+@ApiOperation(value = “Mostra lista de questões”)
+@GetMapping(“/questions”)
+public List < Question > getAllQuestions() {
+return questionRepository.findAll();
+}
+
+## OpenApi
+
+Padrão para escrever as rest APIS sem precisar ter acesso ao código fonte.
+
+## Spring fox
+
+Biblioteca baseada em spring que permite utilizar/gerar a definição do swagger
+
+
+
+
 
 ## Referencias
 
@@ -637,4 +777,5 @@ Ou seja passaremos por parametros de query. No postman temos os querys Params
 - JPA Repositories ->https://docs.spring.io/spring-data/jpa/docs/1.6.0.RELEASE/reference/html/jpa.repositories.html
 - https://docs.jboss.org/hibernate/orm/3.2/api/org/hibernate/Criteria.html
 - https://pt.linkedin.com/pulse/consultas-din%C3%A2micas-com-criteriabuilder-do-hibernate-barros-santos 
+- https://medium.com/rapaduratech/adicionando-swagger-para-testar-sua-api-em-spring-boot-1eebeee70d0f
 - http://www.universidadejava.com.br/jee/jpa-entitymanager/#:~:text=O%20EntityManager%20%C3%A9%20um%20servi%C3%A7o,)%2C%20consultar%20entidades%20e%20outros.
